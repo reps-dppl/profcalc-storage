@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>ProfCalc Studio Pro v8.5 Cloud</title>
+<title>ProfCalc & Storage</title>
+<link rel="icon" type="image/png" href="https://i.ibb.co/68X6G7M/profcalc-icon.png">
+<link rel="apple-touch-icon" href="https://i.ibb.co/68X6G7M/profcalc-icon.png">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -11,56 +13,52 @@
 
 <style>
 :root {
-  --bg: #0f121a; --card-bg: rgba(30, 35, 50, 0.7); --border: rgba(255, 255, 255, 0.1);
+  --bg: #0f121a; 
+  --bg-grad: linear-gradient(135deg, #0f121a 0%, #1a1f2e 100%);
+  --card-bg: rgba(30, 35, 50, 0.7); 
+  --border: rgba(255, 255, 255, 0.1);
   --text: #f0f2f5; --muted: #a0a8b9; --accent: #00f2ff;
   --accent-grad: linear-gradient(135deg, #00f2ff, #7000ff);
   --success: #3ddc97; --danger: #ff4d4d; --warning: #ffab00;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-body { margin: 0; font-family: -apple-system, sans-serif; color: var(--text); background: var(--bg); min-height: 100vh; padding-bottom: 120px; }
+body { 
+    margin: 0; font-family: -apple-system, sans-serif; color: var(--text); 
+    background: var(--bg-grad); background-attachment: fixed;
+    min-height: 100vh; padding-bottom: 120px; 
+}
 .app { max-width: 600px; margin: auto; padding: 12px; }
 
-.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 15px; }
-.modal-content { background: var(--bg); border: 1px solid var(--border); border-radius: 24px; width: 100%; max-width: 500px; padding: 20px; position: relative; max-height: 85vh; overflow-y: auto; }
-
-.header { position: sticky; top: 0; background: var(--bg); z-index: 50; padding: 10px 0; border-bottom: 1px solid var(--border); }
-.stats-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
-.stat-box { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 4px; border-radius: 15px; text-align: center; }
-.stat-box span { font-size: 8px; color: var(--muted); text-transform: uppercase; display: block; }
-.stat-box strong { font-size: 11px; }
-
-.tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px; }
-.tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--muted); }
+.tag-container { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.tag { font-size: 10px; padding: 3px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); border: 1px solid var(--border); }
 .tag.brand { border-color: var(--accent); color: var(--accent); font-weight: bold; }
-.tag.cond { border-color: var(--warning); color: var(--warning); }
+.tag.model { border-color: #7000ff; color: #bd8aff; }
+.tag.color { border-color: var(--warning); color: var(--warning); }
+.tag.condition { border-color: var(--muted); color: #fff; background: rgba(255,255,255,0.1); }
 
-.stock-item { display: flex; flex-direction: column; gap: 12px; padding: 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; margin-bottom: 15px; }
-.img-container { width: 100%; display: flex; gap: 8px; overflow-x: auto; border-radius: 12px; }
-.img-container img { width: 115px; height: 115px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); flex-shrink: 0; }
+.stock-item { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-bottom: 15px; position: relative; }
+.img-container { width: 100%; display: flex; gap: 8px; overflow-x: auto; border-radius: 12px; margin-bottom: 12px; }
+.img-container img { width: 110px; height: 110px; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); flex-shrink: 0; }
 
-.sku-badge { font-family: monospace; font-size: 10px; color: var(--muted); background: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px; }
 .price-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin: 10px 0; }
 .p-box { background: rgba(0,0,0,0.2); padding: 6px 2px; border-radius: 10px; text-align: center; border: 1px solid var(--border); }
 .p-box span { font-size: 7px; color: var(--muted); display: block; }
 .p-box strong { font-size: 10px; }
 
-.card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 24px; padding: 20px; margin-top: 20px; }
-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; display: block; font-weight: 700; text-transform: uppercase; }
-input, select { width: 100% !important; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: inherit; font-size: 14px; outline: none; margin-bottom: 12px; }
+input, select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.05); color: inherit; font-size: 14px; margin-bottom: 10px; }
+label { font-size: 9px; color: var(--muted); margin-bottom: 3px; display: block; font-weight: 700; text-transform: uppercase; }
+.primary-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--accent-grad); color: white; font-weight: 700; cursor: pointer; }
 
-.primary-btn { width: 100%; padding: 16px; border-radius: 16px; border: none; background: var(--accent-grad); color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; }
-.icon-btn { padding: 10px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 11px; }
-
-.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: var(--bg); border-top: 1px solid var(--border); display: flex; padding: 12px 10px 35px; z-index: 100; }
+.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(15, 18, 26, 0.9); backdrop-filter: blur(15px); border-top: 1px solid var(--border); display: flex; padding: 12px 10px 35px; z-index: 100; }
 .tab { color: var(--muted); text-align: center; font-size: 10px; flex: 1; cursor: pointer; }
 .tab.active { color: var(--accent); }
 .tab i { font-size: 20px; margin-bottom: 4px; display: block; }
 
 .view { display: none; }
 .view.active { display: block; }
-#qr-hidden { display: none; }
-.source-btn { background: rgba(255,255,255,0.05); color: var(--text); padding: 8px; border-radius: 10px; font-size: 10px; text-decoration: none; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; gap: 5px; }
-.source-btn img { width: 12px; border-radius: 2px; }
+.modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; align-items: center; justify-content: center; z-index: 2000; }
+#qr-hidden { position: absolute; left: -9999px; }
+.link-icon { position: absolute; top: 20px; right: 20px; color: var(--accent); font-size: 18px; text-decoration: none; }
 </style>
 </head>
 <body>
@@ -68,91 +66,79 @@ input, select { width: 100% !important; padding: 12px; border-radius: 12px; bord
 <div id="qr-hidden"></div>
 <div id="lb" class="modal" onclick="this.style.display='none'"><img id="lb-img" style="max-width:95%; border-radius:15px;"></div>
 
-<div id="detailModal" class="modal" onclick="closeModal(event)">
-    <div class="modal-content" onclick="event.stopPropagation()">
-        <h3 style="margin-top:0; color:var(--accent)">Artikel-Details</h3>
-        <div id="modalBody"></div>
-        <button class="primary-btn" style="margin-top:20px; background:rgba(255,255,255,0.1);" onclick="document.getElementById('detailModal').style.display='none'">Schließen</button>
-    </div>
-</div>
-
 <div class="app">
-  <div class="header">
-    <div style="padding: 0 5px; font-size: 20px; font-weight: 800; background: var(--accent-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: flex; justify-content: space-between; align-items: center;">
-        ProfCalc Studio 8.5
-        <button onclick="exportCSV()" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text); font-size:10px; padding:6px 12px; border-radius:10px;">CSV</button>
-    </div>
-    <div class="stats-row">
-      <div class="stat-box"><span>Lager</span><strong id="stat-count">0</strong></div>
-      <div class="stat-box"><span>Einsatz</span><strong id="stat-ek">0€</strong></div>
-      <div class="stat-box"><span>Gewinn</span><strong id="stat-profit" style="color:var(--success)">0€</strong></div>
-      <div class="stat-box"><span>Ø %</span><strong id="stat-avg-marge">0%</strong></div>
-    </div>
+  <div class="header" style="padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;">
+    <h1 style="margin:0; font-size:18px; font-weight:800; background: var(--accent-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ProfCalc & Storage</h1>
+    <button onclick="exportCSV()" style="background:var(--card-bg); border:1px solid var(--border); color:var(--text); font-size:10px; padding:6px 12px; border-radius:10px;">CSV</button>
   </div>
 
   <div id="view-stock" class="view active">
-    <input type="text" id="searchInput" placeholder="Suche Marke, Modell, Kunde..." oninput="renderStock()" style="margin: 15px 0;">
-    <div id="stockList">Verbinde zur Cloud...</div>
+    <input type="text" id="searchInput" placeholder="Suche (Name, SKU, Kunde)..." oninput="renderStock()" style="margin: 15px 0;">
+    <div id="stockList">Lädt Daten...</div>
   </div>
 
   <div id="view-add" class="view">
-    <div class="card">
-      <h3 style="color:var(--accent); margin-bottom:15px;"><i class="fa fa-plus-circle"></i> Neuaufnahme</h3>
+    <div class="stock-item" style="margin-top:20px;">
+      <label>Produkt Name</label><input id="name" type="text" placeholder="z.B. Jordan 4 Military">
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
-        <div style="grid-column: span 2;"><label>Name</label><input id="name" type="text"></div>
         <div><label>Marke</label><select id="brandSelect"></select></div>
         <div><label>Modell</label><select id="modelSelect"></select></div>
         <div><label>Farbe</label><select id="colorSelect"></select></div>
-        <div><label>Zustand</label><select id="condSelect">
-            <option value="DS">DS (New)</option>
-            <option value="VNDS">VNDS</option>
-            <option value="Used">Used</option>
-        </select></div>
-        <div><label>Zusatz (SKU)</label><input id="special" type="text"></div>
-        <div><label>Kunde</label><input id="customer" type="text"></div>
-        <div><label>Ort</label><input id="loc" type="text"></div>
+        <div><label>Größe</label><input id="special" type="text"></div>
         <div><label>EK (€)</label><input id="ek" type="number" oninput="calcByPrice()"></div>
         <div><label>Marge (%)</label><input id="margeInput" type="number" oninput="calcByMarge()"></div>
         <div style="grid-column: span 2;"><label>VK (€)</label><input id="vk" type="number" oninput="calcByPrice()"></div>
-        <div style="grid-column: span 2;"><label>Link</label><input id="link" type="url"></div>
-        <div style="grid-column: span 2;">
-            <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this)">
-            <button class="icon-btn" id="uploadBtn" style="width:100%; background:rgba(255,255,255,0.05); color:var(--text); border:1px solid var(--border);" onclick="document.getElementById('fileInput').click()"><i class="fa fa-camera"></i> Bilder hochladen</button>
-            <div id="imagePreview" style="display:flex; gap:10px; margin-top:10px; overflow-x:auto;"></div>
+        <div><label>Zustand</label>
+          <select id="condition">
+            <option value="DS">DS (New)</option>
+            <option value="VNDS">VNDS</option>
+            <option value="Used">Used</option>
+            <option value="B-Grade">B-Grade</option>
+          </select>
         </div>
+        <div><label>Regal / Platz</label><input id="shelf" type="text" placeholder="A1"></div>
+        <div style="grid-column: span 2;"><label>Kunde (Reserviert)</label><input id="customer" type="text"></div>
+        <div style="grid-column: span 2;"><label>Link (Quelle)</label><input id="link" type="text" placeholder="https://..."></div>
       </div>
-      <button class="primary-btn" style="margin-top:15px;" onclick="addItem()">Artikel Speichern</button>
+      <input type="file" id="fileInput" multiple style="display:none" onchange="handleFiles(this)">
+      <button class="primary-btn" style="background:rgba(255,255,255,0.05); margin-bottom:10px;" onclick="document.getElementById('fileInput').click()">Bilder wählen</button>
+      <div id="imagePreview" style="display:flex; gap:10px; margin-bottom:15px; overflow-x:auto;"></div>
+      <button class="primary-btn" onclick="addItem()">Artikel Speichern</button>
     </div>
   </div>
 
-  <div id="view-archive" class="view"><div id="archiveList"></div></div>
-  <div id="view-settings" class="view"><div class="card" id="config-sections"></div></div>
+  <div id="view-archive" class="view"><div id="archiveList" style="margin-top:20px;"></div></div>
+  <div id="view-settings" class="view"><div class="stock-item" id="config-sections" style="margin-top:20px;"></div></div>
 </div>
 
 <div class="tabs">
   <div class="tab active" onclick="switchTab('stock', this)"><i class="fa fa-box"></i>Lager</div>
-  <div class="tab" onclick="switchTab('add', this)"><i class="fa fa-plus"></i>Neu</div>
-  <div class="tab" onclick="switchTab('archive', this)"><i class="fa fa-archive"></i>Archiv</div>
+  <div class="tab" onclick="switchTab('add', this)"><i class="fa fa-plus-circle"></i>Neu</div>
+  <div class="tab" onclick="switchTab('archive', this)"><i class="fa fa-history"></i>Archiv</div>
   <div class="tab" onclick="switchTab('settings', this)"><i class="fa fa-cog"></i>Konfig</div>
 </div>
 
 <script>
 const SB_URL = "https://rlxmagieimepjgbgrimu.supabase.co"; 
-const SB_KEY = "sb_publishable_-FMIqEzTY5pD3LmRmseJ1A_T5bMWPLk";
+const SB_KEY = "sb_publishable_-FMIqEzTY5pD3LmRmseJ1A_T5bMWPLk"; 
 const IMGBB_API_KEY = "41b752418517f384734a0eb0219a5061";
 const supabaseClient = window.supabase.createClient(SB_URL, SB_KEY);
 
 let inventory = [], archive = [], currentImages = [];
-let settings = JSON.parse(localStorage.getItem("pc_cfg_65")) || { brands:{}, models:{}, colors:{} };
+let settings = { brands: {}, models: {}, colors: {} };
 
-async function loadData() {
-    const { data, error } = await supabaseClient.from('inventory').select('*');
-    if (error) { document.getElementById('stockList').innerHTML = "Fehler: " + error.message; return; }
-    inventory = data.filter(i => !i.is_archived).map(i => i.data);
-    archive = data.filter(i => i.is_archived).map(i => i.data);
+async function loadCloudData() {
+    const { data: items } = await supabaseClient.from('inventory').select('*');
+    if(items) {
+        inventory = items.filter(i => !i.is_archived).map(i => i.data);
+        archive = items.filter(i => i.is_archived).map(i => i.data);
+    }
+    const { data: cfg } = await supabaseClient.from('config').select('*').eq('id', 1).single();
+    if(cfg) settings = cfg.data;
     renderAll();
 }
 
+// Margen-Rechner Logik
 function calcByMarge() {
     const ek = parseFloat(document.getElementById('ek').value) || 0;
     const m = parseFloat(document.getElementById('margeInput').value) || 0;
@@ -164,139 +150,137 @@ function calcByPrice() {
     if(ek > 0 && vk > 0) document.getElementById('margeInput').value = (((vk - ek) / ek) * 100).toFixed(1);
 }
 
-async function handleFiles(input) {
-    const btn = document.getElementById('uploadBtn');
-    btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Upload...';
-    for (const file of input.files) {
-        const fd = new FormData(); fd.append("image", file);
-        try {
-            const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
-            const json = await res.json();
-            currentImages.push(json.data.url);
-            updatePreview();
-        } catch (e) { alert("Upload Fehler"); }
-    }
-    btn.innerHTML = '<i class="fa fa-camera"></i> Bilder hochladen';
+// Suchfunktion (FIXED)
+function renderStock() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const list = document.getElementById('stockList');
+    
+    const filtered = inventory.filter(i => {
+        return i.name.toLowerCase().includes(q) || 
+               i.sku.toLowerCase().includes(q) || 
+               (i.customer && i.customer.toLowerCase().includes(q));
+    });
+    
+    list.innerHTML = filtered.map(i => createItemHTML(i)).join('');
 }
 
-function updatePreview() { document.getElementById('imagePreview').innerHTML = currentImages.map(img => `<img src="${img}" style="width:50px;height:50px;border-radius:8px;object-fit:cover;">`).join(''); }
+// Restliche Funktionen wie vorher...
+async function handleFiles(input) {
+    for (const file of input.files) {
+        const fd = new FormData(); fd.append("image", file);
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: fd });
+        const json = await res.json();
+        currentImages.push(json.data.url);
+    }
+    document.getElementById('imagePreview').innerHTML = currentImages.map(img => `<img src="${img}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">`).join('');
+}
 
 function generateLabel(id) {
     const item = inventory.find(i => i.id === id) || archive.find(i => i.id === id);
-    if(!item) return;
     const qrDiv = document.getElementById('qr-hidden');
     qrDiv.innerHTML = "";
-    new QRCode(qrDiv, { text: item.id, width: 100, height: 100 });
+    new QRCode(qrDiv, { text: item.id, width: 200, height: 200 });
     setTimeout(() => {
         const qrImg = qrDiv.querySelector('img').src;
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ unit: 'mm', format: [60, 40] });
-        doc.setFontSize(10); doc.setFont(undefined, 'bold');
-        doc.text(item.sku, 5, 8);
-        doc.setFontSize(7); doc.text("Kunde: " + (item.customer || "-"), 5, 14);
-        doc.text("Ort: " + (item.loc || "-"), 5, 18);
-        doc.text(item.name.substring(0,25), 5, 22);
-        doc.addImage(qrImg, 'PNG', 38, 2, 18, 18);
-        doc.save(`Label_${item.sku}.pdf`);
-    }, 400);
+        const doc = new jsPDF({ unit: 'mm', format: [40, 60] });
+        doc.setFont("helvetica", "bold"); doc.setFontSize(14);
+        doc.text(item.brandName, 20, 10, { align: "center" });
+        doc.setFontSize(9); doc.setFont("helvetica", "normal");
+        doc.text("Modell:", 5, 20); doc.text(item.modelName, 35, 20, { align: "right" });
+        doc.text("Größe:", 5, 26); doc.text(item.special || "-", 35, 26, { align: "right" });
+        doc.text("Regal:", 5, 32); doc.text(item.shelf || "-", 35, 32, { align: "right" });
+        doc.rect(5, 36, 30, 0.3, 'F');
+        doc.setFontSize(14); doc.text(`${item.vk},00 €`, 20, 44, { align: "center" });
+        doc.addImage(qrImg, 'PNG', 12, 47, 16, 16);
+        doc.save(`Label_${item.id}.pdf`);
+    }, 500);
 }
 
-function createItemHTML(item, isArchive = false) {
-    const marge = item.ek > 0 ? (((item.vk - item.ek) / item.ek) * 100).toFixed(1) : 0;
-    const fav = item.link ? `https://www.google.com/s2/favicons?domain=${new URL(item.link).hostname}&sz=64` : '';
+function createItemHTML(item, isArchived = false) {
     return `
-    <div class="stock-item" style="${isArchive ? 'opacity:0.8' : ''}">
-        <div class="img-container">${item.images.map(img => `<img src="${img}" onclick="openLB('${img}')">`).join('') || '<div style="padding:40px; color:var(--muted)">Keine Bilder</div>'}</div>
-        <div class="stock-info">
-            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                <div>
-                    <strong style="font-size:16px;">${item.name}</strong>
-                    <div class="tag-container">
-                        <span class="tag brand">${item.brandName}</span>
-                        <span class="tag">${item.modelName}</span>
-                        <span class="tag" style="border-color:var(--accent); color:var(--accent);">${item.colorName || 'Color'}</span>
-                        ${item.special ? `<span class="tag" style="background:rgba(0,242,255,0.1); color:var(--accent);">${item.special}</span>` : ''}
-                        <span class="tag cond">${item.cond}</span>
-                    </div>
+    <div class="stock-item" style="${isArchived ? 'opacity:0.7' : ''}">
+        ${item.link ? `<a href="${item.link}" target="_blank" class="link-icon"><i class="fa fa-link"></i></a>` : ''}
+        <div class="img-container">${item.images.map(img => `<img src="${img}" onclick="openLB('${img}')">`).join('')}</div>
+        <div style="display:flex; justify-content:space-between;">
+            <div>
+                <strong style="font-size:16px;">${item.name}</strong>
+                <div class="tag-container">
+                    <span class="tag brand">${item.brandName}</span>
+                    <span class="tag model">${item.modelName}</span>
+                    <span class="tag color">${item.colorName}</span>
+                    <span class="tag condition">${item.condition || 'DS'}</span>
+                    <span class="tag">📦 ${item.shelf || '-'}</span>
+                    ${item.customer ? `<span class="tag">👤 ${item.customer}</span>` : ''}
                 </div>
-                <div class="sku-badge">${item.sku}</div>
             </div>
-            <div class="price-row">
-                <div class="p-box"><span>EK</span><strong>${item.ek}€</strong></div>
-                <div class="p-box"><span>VK</span><strong>${item.vk}€</strong></div>
-                <div class="p-box"><span>Profit</span><strong>${(item.vk-item.ek).toFixed(2)}€</strong></div>
-                <div class="p-box"><span>Marge</span><strong>${marge}%</strong></div>
-            </div>
-            <div style="font-size:11px; color:var(--muted); margin-bottom:10px; display:flex; gap:15px;">
-                <span><i class="fa fa-user"></i> ${item.customer || '-'}</span>
-                <span><i class="fa fa-map-marker-alt"></i> ${item.loc}</span>
-            </div>
-            <div style="display:flex; gap:8px;">
-                <button class="icon-btn" style="flex:1; background:var(--card-bg); color:var(--text); border:1px solid var(--border)" onclick="generateLabel('${item.id}')"><i class="fa fa-qrcode"></i> LABEL</button>
-                ${item.link ? `<a href="${item.link}" target="_blank" class="source-btn" style="flex:1;"><i class="fa fa-link"></i> Link ${fav ? `<img src="${fav}">`:''}</a>` : ''}
-            </div>
-            ${!isArchive ? `
-            <div style="display:flex; gap:8px; margin-top:10px;">
-                <button class="icon-btn" style="background:var(--success); color:#000; flex:1;" onclick="sellItem('${item.id}')">VERKAUFT</button>
-                <button class="icon-btn" style="background:rgba(255,77,77,0.1); color:var(--danger); border:1px solid var(--danger); width:40px;" onclick="deleteItem('${item.id}')"><i class="fa fa-trash"></i></button>
-            </div>` : `<button class="icon-btn" style="width:100%; margin-top:10px; border:1px solid var(--border);" onclick="showDetails('${item.id}')">DETAILS</button>`}
+            <span style="font-family:monospace; font-size:9px; color:var(--muted)">${item.sku}</span>
+        </div>
+        <div class="price-row">
+            <div class="p-box"><span>EK</span><strong>${item.ek}€</strong></div>
+            <div class="p-box"><span>VK</span><strong>${item.vk}€</strong></div>
+            <div class="p-box"><span>Profit</span><strong style="color:var(--success)">${(item.vk-item.ek).toFixed(2)}€</strong></div>
+            <div class="p-box"><span>Marge</span><strong>${(((item.vk-item.ek)/item.ek)*100).toFixed(0)}%</strong></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+            <button class="primary-btn" style="flex:1; padding:10px; font-size:11px;" onclick="generateLabel('${item.id}')">LABEL</button>
+            ${!isArchived ? `<button class="primary-btn" style="flex:1; padding:10px; font-size:11px; background:var(--success); color:#000;" onclick="sellItem('${item.id}')">VERKAUFT</button>` : ''}
+            <button class="primary-btn" style="width:40px; padding:10px; background:rgba(255,77,77,0.1); color:var(--danger);" onclick="deleteItem('${item.id}')"><i class="fa fa-trash"></i></button>
         </div>
     </div>`;
 }
 
 async function addItem() {
-    const n = document.getElementById('name').value, ek = document.getElementById('ek').value;
-    if(!n || !ek) return alert("Name/EK fehlt!");
-    const bID = document.getElementById('brandSelect').value, mID = document.getElementById('modelSelect').value, cID = document.getElementById('colorSelect').value, s = document.getElementById('special').value;
     const item = {
-        id: "PC-" + Date.now(), name: n, brandID: bID, brandName: settings.brands[bID] || bID,
-        modelID: mID, modelName: settings.models[mID] || mID, colorID: cID, colorName: settings.colors[cID] || cID,
-        special: s, sku: `${bID}/${mID}/${cID}${s ? '-' + s.toUpperCase() : ''}`, ek: parseFloat(ek), vk: parseFloat(document.getElementById('vk').value) || 0,
-        customer: document.getElementById('customer').value, loc: document.getElementById('loc').value || '-', cond: document.getElementById('condSelect').value,
-        link: document.getElementById('link').value, images: [...currentImages], date: new Date().toLocaleDateString()
+        id: "PC-" + Date.now(), name: document.getElementById('name').value,
+        brandName: settings.brands[document.getElementById('brandSelect').value],
+        modelName: settings.models[document.getElementById('modelSelect').value],
+        colorName: settings.colors[document.getElementById('colorSelect').value],
+        special: document.getElementById('special').value, ek: parseFloat(document.getElementById('ek').value) || 0,
+        vk: parseFloat(document.getElementById('vk').value) || 0,
+        condition: document.getElementById('condition').value, shelf: document.getElementById('shelf').value,
+        customer: document.getElementById('customer').value, link: document.getElementById('link').value, 
+        sku: `${document.getElementById('brandSelect').value}/${document.getElementById('modelSelect').value}`,
+        images: [...currentImages], date: new Date().toLocaleDateString()
     };
-    const { error } = await supabaseClient.from('inventory').insert([{ id: item.id, data: item, is_archived: false }]);
-    if (error) alert(error.message); else { loadData(); currentImages = []; document.getElementById('imagePreview').innerHTML = ""; document.getElementById('name').value = ""; switchTab('stock', document.querySelectorAll('.tab')[0]); }
+    await supabaseClient.from('inventory').insert([{ id: item.id, data: item, is_archived: false }]);
+    currentImages = []; document.getElementById('imagePreview').innerHTML = ""; loadCloudData(); switchTab('stock', document.querySelectorAll('.tab')[0]);
 }
 
-async function sellItem(id) { await supabaseClient.from('inventory').update({ is_archived: true }).eq('id', id); loadData(); }
-async function deleteItem(id) { if(confirm("Löschen?")) { await supabaseClient.from('inventory').delete().eq('id', id); loadData(); } }
-function showDetails(id) { const item = archive.find(i => i.id === id) || inventory.find(i => i.id === id); document.getElementById('modalBody').innerHTML = createItemHTML(item, true); document.getElementById('detailModal').style.display = 'flex'; }
-
-function renderStock() {
-    const q = document.getElementById('searchInput').value.toLowerCase();
-    document.getElementById('stockList').innerHTML = inventory.filter(i => i.name.toLowerCase().includes(q) || i.sku.toLowerCase().includes(q)).map(i => createItemHTML(i)).join('');
-}
-function renderArchive() {
-    document.getElementById('archiveList').innerHTML = archive.map(item => `<div class="card" style="padding:15px; margin-top:10px;"><div style="display:flex; justify-content:space-between; align-items:center;"><div><strong>${item.name}</strong><br><small>${item.vk}€</small></div><button class="icon-btn" onclick="showDetails('${item.id}')">INFO</button></div></div>`).join('');
-}
-function updateStats() {
-    const tek = inventory.reduce((s, i) => s + i.ek, 0), profit = archive.reduce((s, i) => s + (i.vk - i.ek), 0);
-    document.getElementById('stat-count').innerText = inventory.length;
-    document.getElementById('stat-ek').innerText = Math.round(tek) + "€";
-    document.getElementById('stat-profit').innerText = Math.round(profit) + "€";
-}
+async function sellItem(id) { await supabaseClient.from('inventory').update({ is_archived: true }).eq('id', id); loadCloudData(); }
+async function deleteItem(id) { if(confirm("Löschen?")) { await supabaseClient.from('inventory').delete().eq('id', id); loadCloudData(); } }
 
 function renderAll() {
-    renderStock(); renderArchive(); updateStats();
-    const f = (id, o) => { const el = document.getElementById(id); if(el) el.innerHTML = Object.entries(o).map(([k,v]) => `<option value="${k}">${v}</option>`).join('') || '<option value="?">Keine Daten</option>'; };
-    f('brandSelect', settings.brands); f('modelSelect', settings.models); f('colorSelect', settings.colors);
+    renderStock();
+    document.getElementById('archiveList').innerHTML = archive.map(i => createItemHTML(i, true)).join('');
+    ['brandSelect','modelSelect','colorSelect'].forEach(id => {
+        const type = id.replace('Select','').toLowerCase() + 's';
+        if(document.getElementById(id)) {
+            document.getElementById(id).innerHTML = Object.entries(settings[type]).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+        }
+    });
     let h = `<h3>Konfiguration</h3>`;
-    [{l:"Marken",k:"brands"},{l:"Modelle",k:"models"},{l:"Farben",k:"colors"}].forEach(t => {
-        h += `<label>${t.l}</label><div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">${Object.entries(settings[t.k]).map(([k,v])=>`<div style="background:rgba(255,255,255,0.06); padding:5px; border-radius:8px; font-size:10px;">${k}: ${v} <i class="fa fa-times" onclick="delCfg('${t.k}','${k}')" style="color:var(--danger)"></i></div>`).join('')}</div>
-        <div style="display:flex; gap:5px; margin-bottom:20px;"><input id="in-k-${t.k}" placeholder="ID" style="flex:0.3; margin:0;"><input id="in-v-${t.k}" placeholder="Name" style="flex:1; margin:0;"><button class="icon-btn" style="background:var(--accent); color:#000;" onclick="addCfg('${t.k}')">+</button></div>`;
+    ['brands','models','colors'].forEach(t => {
+        h += `<label>${t.toUpperCase()}</label><div style="display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px;">${Object.entries(settings[t]).map(([k,v])=>`<div style="background:rgba(255,255,255,0.06); padding:5px; border-radius:8px; font-size:10px;">${k}: ${v} <i class="fa fa-times" onclick="delCfg('${t}','${k}')" style="color:var(--danger)"></i></div>`).join('')}</div>
+        <div style="display:flex; gap:5px; margin-bottom:15px;"><input id="in-k-${t}" placeholder="ID" style="flex:0.3; margin:0;"><input id="in-v-${t}" placeholder="Name" style="flex:1; margin:0;"><button class="primary-btn" style="width:50px; padding:0;" onclick="addCfg('${t}')">+</button></div>`;
     });
     document.getElementById('config-sections').innerHTML = h;
 }
 
-function addCfg(t) { const k = document.getElementById(`in-k-${t}`).value.toUpperCase().trim(), v = document.getElementById(`in-v-${t}`).value.trim(); if(k && v) { settings[t][k] = v; localStorage.setItem("pc_cfg_65", JSON.stringify(settings)); renderAll(); } }
-function delCfg(t, k) { delete settings[t][k]; localStorage.setItem("pc_cfg_65", JSON.stringify(settings)); renderAll(); }
+function addCfg(t) {
+    const k = document.getElementById(`in-k-${t}`).value.toUpperCase().trim(), v = document.getElementById(`in-v-${t}`).value.trim();
+    if(k && v) { settings[t][k] = v; saveSettings(); }
+}
+async function delCfg(t, k) { delete settings[t][k]; saveSettings(); }
+async function saveSettings() { await supabaseClient.from('config').upsert({ id: 1, data: settings }); renderAll(); }
 function switchTab(v, el) { document.querySelectorAll('.view').forEach(x => x.classList.remove('active')); document.getElementById('view-' + v).classList.add('active'); document.querySelectorAll('.tab').forEach(x => x.classList.remove('active')); el.classList.add('active'); }
 function openLB(src) { document.getElementById('lb-img').src = src; document.getElementById('lb').style.display = 'flex'; }
-function closeModal(e) { if(e.target.id === 'detailModal' || e.target.id === 'lb') e.target.style.display = 'none'; }
-function exportCSV() { let csv = "\ufeffName,Marke,Modell,SKU,EK,VK,Kunde\n"; inventory.forEach(i => csv += `${i.name},${i.brandName},${i.modelName},${i.sku},${i.ek},${i.vk},${i.customer}\n`); const blob = new Blob([csv], { type: 'text/csv' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Export.csv`; a.click(); }
-
-loadData();
+function exportCSV() { 
+    let csv = "\ufeffName,Zustand,Regal,Kunde,EK,VK\n"; 
+    inventory.forEach(i => csv += `${i.name},${i.condition},${i.shelf},${i.customer},${i.ek},${i.vk}\n`); 
+    const b = new Blob([csv], {type:'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'ProfCalc_Export.csv'; a.click(); 
+}
+loadCloudData();
 </script>
 </body>
 </html>
